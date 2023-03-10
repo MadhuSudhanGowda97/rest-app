@@ -12,7 +12,7 @@ app.get('/dataset1', db.getUsers)
 app.get('/dataset1/get/:id',db.getUserById)
 
 //Inserting data
-app.post('/dataset1/create/:eid',db.createUser)
+app.post('/dataset1/create',db.createUser)
 
 //Deleting data
 app.delete('/dataset1/delete/:id',db.deleteUser)

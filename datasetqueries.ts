@@ -18,14 +18,17 @@ interface dbrecord {
   updated_date: string
 }
 import express, { Request, Response } from "express";
-pool.connect(function (err: any) {
-  if (err) throw err;
-  console.log("Connected!");
+pool.connect(function (err: any,res:any) {
+  if (err) {console.error("Bad connection");
+  throw err
+  }
+  else{
+  console.log("Connected!");}
 });
 var getUsers = async (req: Request, res: Response) => {
-  var aclient = await pool.query('select * from datasets;')
+  var aclient = await pool.query('select * from datasets order by id;')
   if (aclient.rows.length === 0) {
-    res.send({
+    res.status(400).send({
       "status_code": 400,
       "reason_phrase": "Bad Request",
       "error_code": "Empty_table",
@@ -41,7 +44,7 @@ var getUserById = async (req: Request, res: Response) => {
 
   var gclient = await pool.query('select * from datasets where id = $1;', [id], (error: any, results: any) => {
     if (results.rows.length === 0) {
-      res.send({
+      res.status(404).send({
         "status_code": 404,
         "reason_phrase": "The requested operation failed because a resource associated with the request could not be found.",
         "error_code": "Not_found",
@@ -55,23 +58,29 @@ var getUserById = async (req: Request, res: Response) => {
 }
 
 var createUser = async (req: Request, res: Response) => {
-  var eid = req.params.eid
+  var now = new Date().toLocaleString()
   var { id, data_schema, router_config, status, created_by, updated_by, created_dated, updated_date }: dbrecord = req.body
-  var recExists = await pool.query(`select * from datasets where id = '${eid}'`)
+  var recExists = await pool.query(`select * from datasets where id = '${id}'`)
   if (recExists.rows.length == 0) {
     var cclient = pool.query('INSERT INTO datasets values($1,$2,$3,$4,$5,$6,$7,$8);',
-      [id, data_schema, router_config, status, created_by, updated_by, created_dated, updated_date], (error: any, result: any) => {
-        console.log(error)
+      [id, data_schema, router_config, status, created_by, updated_by, now, now], (error: any, result: any) => {
         if (!error) {
-          res.send(`The record is created`)
+          res.status(201).send({
+            "status_code": 201,
+            "success_message":"The record is successfully created"
+          })
         }
         else {
-          res.send("insertion of details are incomplete")
+          res.status(400).send({
+          "status_code": 400,
+          "reason_phrase": "The requested operation failed because there is no id in the input.",
+          "error_code": "Bad Request",
+          "error_message": "Id is missing"})
         }
       })
   }
   else {
-    res.send({
+    res.status(409).send({
       "status_code": 409,
       "reason_phrase": "The requested operation failed because it tried to create a resource that already exists.",
       "error_code": "duplicate",
@@ -86,7 +95,7 @@ var deleteUser = async (req: Request, res: Response) => {
   var id = parseInt(req.params.id)
   var gclient = await pool.query(' delete from datasets where id = $1;', [id], (error: any, results: any) => {
     if (error) {
-      res.send({
+      res.status(404).send({
         "status_code": 404,
         "reason_phrase": "The requested operation failed because a resource associated with the request could not be found.",
         "error_code": "Not_found",
@@ -94,7 +103,10 @@ var deleteUser = async (req: Request, res: Response) => {
       })
     }
     else {
-      res.send(`The record with ${id} is deleted`)
+      res.status(200).send({
+        "status_code":200,
+        "success_message":"The record is deleted"
+      })
     }
   })
 }
