@@ -58,7 +58,7 @@ var getUserById = async (req: Request, res: Response) => {
 }
 
 var createUser = async (req: Request, res: Response) => {
-  var now = new Date().toLocaleString()
+  var now = new Date()
   var { id, data_schema, router_config, status, created_by, updated_by, created_dated, updated_date }: dbrecord = req.body
   var recExists = await pool.query(`select * from datasets where id = '${id}'`)
   if (recExists.rows.length == 0) {
@@ -90,29 +90,69 @@ var createUser = async (req: Request, res: Response) => {
 }
 
 
+var updateUser = async(req:any,res:any)=>
+  {
+    var now = new Date()
+     var id =parseInt(req.params.id)
+      var recExists = await pool.query(`select * from datasets where id = '${id}'`)
+      var {data_schema, router_config, status, updated_by }:dbrecord=req.body
+      if (recExists.rows.length != 0) {
+      pool.query(`UPDATE datasets set data_schema=$1,router_config=$2,status=$3,updated_by=$4,updated_date=$5 where id =$6 ;`,
+           [data_schema, router_config, status, updated_by, now,id ],(error:any, result:any) => 
+           {
+              if (!error) {
+                res.status(200).send({
+                  "status_code": 200,
+                  "success_message":"The record is successfully updated"
+              })
+              }
+              else{
+                res.status(400).send({
+                  "status_code": 400,
+                  "reason_phrase": "Null values found.",
+                  "error_code": "Bad Request",
+                  "error_message": "insufficient data"})
+              }
+            })}
+              else{
+                res.status(404).send({
+                  "status_code": 404,
+                  "reason_phrase": "The requested operation failed because a resource associated with the request could not be found.",
+                  "error_code": "Not_found",
+                  "error_message": "The data you requested could not be found in Database"
+              })
+            }
+            }
+
+
 
 var deleteUser = async (req: Request, res: Response) => {
   var id = parseInt(req.params.id)
+  var recExists = await pool.query(`select * from datasets where id = '${id}'`)
+  if (recExists.rows.length != 0) {
   var gclient = await pool.query(' delete from datasets where id = $1;', [id], (error: any, results: any) => {
-    if (error) {
-      res.status(404).send({
-        "status_code": 404,
-        "reason_phrase": "The requested operation failed because a resource associated with the request could not be found.",
-        "error_code": "Not_found",
-        "error_message": "The data you requested could not be found in Database"
-      })
+    if (!error) {
+        res.status(200).send({
+          "status_code":200,
+          "success_message":"The record is deleted"
+    })
+    
     }
-    else {
-      res.status(200).send({
-        "status_code":200,
-        "success_message":"The record is deleted"
-      })
-    }
+  })}
+  else{
+    res.status(404).send({
+      "status_code": 404,
+      "reason_phrase": "The requested operation failed because a resource associated with the request could not be found.",
+      "error_code": "Not_found",
+      "error_message": "The data you requested could not be found in Database"
   })
 }
+}
+
 module.exports = {
   getUsers,
   getUserById,
   createUser,
+  updateUser,
   deleteUser
 }
