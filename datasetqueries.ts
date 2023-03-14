@@ -7,7 +7,7 @@ var pool = new Pool({
   port: 5432
 
 })
-interface dbrecord {
+interface Dbrecord {
   id: string,
   data_schema: object,
   router_config: object,
@@ -17,7 +17,7 @@ interface dbrecord {
   created_dated: string,
   updated_date: string
 }
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 pool.connect(function (err: any,res:any) {
   if (err) {console.error("Bad connection");
   throw err
@@ -59,7 +59,7 @@ var getUserById = async (req: Request, res: Response) => {
 
 var createUser = async (req: Request, res: Response) => {
   var now = new Date()
-  var { id, data_schema, router_config, status, created_by, updated_by, created_dated, updated_date }: dbrecord = req.body
+  var { id, data_schema, router_config, status, created_by, updated_by, created_dated, updated_date }: Dbrecord = req.body
   var recExists = await pool.query(`select * from datasets where id = '${id}'`)
   if (recExists.rows.length == 0) {
     var cclient = pool.query('INSERT INTO datasets values($1,$2,$3,$4,$5,$6,$7,$8);',
@@ -95,7 +95,7 @@ var updateUser = async(req:any,res:any)=>
     var now = new Date()
      var id =parseInt(req.params.id)
       var recExists = await pool.query(`select * from datasets where id = '${id}'`)
-      var {data_schema, router_config, status, updated_by }:dbrecord=req.body
+      var {data_schema, router_config, status, updated_by }:Dbrecord=req.body
       if (recExists.rows.length != 0) {
       pool.query(`UPDATE datasets set data_schema=$1,router_config=$2,status=$3,updated_by=$4,updated_date=$5 where id =$6 ;`,
            [data_schema, router_config, status, updated_by, now,id ],(error:any, result:any) => 
@@ -149,10 +149,19 @@ var deleteUser = async (req: Request, res: Response) => {
 }
 }
 
-module.exports = {
+// module.exports = {
+//   getUsers,
+//   getUserById,
+//   createUser,
+//   updateUser,
+//   deleteUser
+// }
+
+
+export {
   getUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser
+   getUserById,
+   createUser,
+   updateUser,
+   deleteUser
 }

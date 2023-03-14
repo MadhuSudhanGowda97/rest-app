@@ -1,24 +1,27 @@
-var express =require('express')
-var app= express();
+var express = require('express')
+//import express from 'express';
+var app: Application = express();
 var port =2023
-const db = require('./datasetqueries.ts')
+import { Application } from 'express';
+// const db = require('./datasetqueries')
+import { createUser, deleteUser, getUserById, getUsers, updateUser } from './datasetqueries';
 app.use(express.json())
 
 
 //Getting all the data
-app.get('/dataset1', db.getUsers)
+app.get('/dataset1', getUsers)
 
 //Getting data by id
-app.get('/dataset1/get/:id',db.getUserById)
+app.get('/dataset1/get/:id',getUserById)
 
 //Inserting data
-app.post('/dataset1/create',db.createUser)
+app.post('/dataset1/create',createUser)
 
 //Updated data
-app.put('/dataset1/update/:id',db.updateUser)
+app.put('/dataset1/update/:id',updateUser)
 
 //Deleting data
-app.delete('/dataset1/delete/:id',db.deleteUser)
+app.delete('/dataset1/delete/:id',deleteUser)
         
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)
