@@ -1,7 +1,7 @@
 var Pool = require('pg').Pool
 var pool = new Pool({
   user: 'postgres',
-  host: 'localhost',
+  host: 'host.docker.internal',
   //'host.docker.internal' if we want to connect in docker
   database: 'postgres',
   password: '12345',
