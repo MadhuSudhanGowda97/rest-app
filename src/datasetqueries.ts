@@ -1,7 +1,15 @@
 var Pool = require('pg').Pool
+var dotenv = require('dotenv')
+dotenv.config();
+// const TestPool = require('test-pg-pool');
+// if(process.env.NODE_ENV == 'test'){
+  
+//   const pool = new TestPool();
+// }
+// else{
 var pool = new Pool({
   user: 'postgres',
-  host: 'host.docker.internal',
+  host: 'localhost',
   //'host.docker.internal' if we want to connect in docker
   database: 'postgres',
   password: '12345',
@@ -19,6 +27,7 @@ interface Dbrecord {
   updated_date: string
 }
 import { Request, Response } from "express";
+
 pool.connect(function (err: any, res: any) {
   if (err) {
     console.error("Bad connection");
@@ -27,10 +36,10 @@ pool.connect(function (err: any, res: any) {
       throw err
     }
     catch (err) {
-      // console.error({
-      //   "error code":502,
-      //   "error message":"Bad gateway"
-      // })
+      console.error({
+        "error code":502,
+        "error message":"Bad gateway"
+      })
     }
   }
   else {
@@ -41,6 +50,7 @@ pool.connect(function (err: any, res: any) {
 //get all users
 var getUsers = async (req: Request, res: Response) => {
   var aclient = await pool.query('select * from datasets order by id;')
+  
   if (aclient.rows.length === 0) {
     res.status(400).json({
       "status_code": 400,
@@ -50,15 +60,15 @@ var getUsers = async (req: Request, res: Response) => {
     })
   }
   else {
-    res.json(aclient.rows)
+    res.status(200).json(aclient.rows)
   }
 }
 //get user by id
 var getUserById = async (req: Request, res: Response) => {
   var id = parseInt(req.params.id)
 
-  var gclient = await pool.query('select * from datasets where id = $1;', [id], (error: any, results: any) => {
-    if (results.rows.length === 0) {
+  var gclient = await pool.query('select * from datasets where id = $1;', [id]) 
+    if (gclient.rowsCount === 0) {
       res.status(404).json({
         "status_code": 404,
         "reason_phrase": "The requested operation failed because a resource associated with the request could not be found.",
@@ -67,10 +77,9 @@ var getUserById = async (req: Request, res: Response) => {
       })
     }
     else {
-      res.json(results.rows)
+      res.status(200).json(gclient.rows)
     }
-  })
-}
+  }
 //create user
 var createUser = async (req: Request, res: Response) => {
   var now = new Date()
@@ -118,7 +127,8 @@ var updateUser = async (req: any, res: any) => {
         res.status(200).json({
           "status_code": 200,
           "success_message": "The record is successfully updated"
-        })
+        }
+        )
       }
       else {
         res.status(400).json({
@@ -184,14 +194,14 @@ var partialupdateUser = async (req: any, res: any) => {
 var deleteUser = async (req: Request, res: Response) => {
   var id = parseInt(req.params.id)
   var recExists = await pool.query(`select * from datasets where id = '${id}'`)
-  if (recExists.rows.length != 0) {
+  if (recExists.rowsCount != 0) {
     var gclient = await pool.query(' delete from datasets where id = $1;', [id], (error: any, results: any) => {
       if (!error) {
         res.status(200).json({
           "status_code": 200,
           "success_message": "The record is deleted"
+          
         })
-
       }
     })
   }
@@ -215,6 +225,7 @@ var deleteUser = async (req: Request, res: Response) => {
 
 
 export {
+  pool,
   getUsers,
   getUserById,
   createUser,

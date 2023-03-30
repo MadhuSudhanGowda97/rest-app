@@ -1,4 +1,6 @@
 var express = require('express')
+var dotenv = require('dotenv')
+dotenv.config();
 //import express from 'express';
 var app: Application = express();
 var port =2023
@@ -28,7 +30,7 @@ app.delete('/dataset1/delete/:id',deleteUser)
 
 app.all('*',(req:any,res:any)=>{
   res.status(404).json({
-    "status_code": 404.1,
+    "status_code": 404,
     "error_code": "Page Not Found"
   })
 })
@@ -37,3 +39,4 @@ app.listen(port, () => {
     console.log(`App running on port ${port}.`)
   })
 
+  export default app
