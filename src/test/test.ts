@@ -88,30 +88,30 @@
 
 
 // describe('Post method', () => {
-//     it('Data Insufficient', (done) => {
-//         let record = {
-//             "data_schema": {
-//                 "name": "JohndoeI",
-//                 "mail": "jdoe1@gmail.com",
-//                 "age": 20
-//             },
-//             "router_config": {
-//                 "Ip_address": "192.158.1.03"
-//             },
-//             "status": "Active",
-//             "created_by": "System",
-//             "updated_by": "Madhusudhan"
-//         }
-//       chai.request(app)
-//         .post('/dataset1/create')
-//         .send(record)
-//         .end((err:any, res:any) => {               
-//                 res.should.have.status(400);
-//                 res.body.should.be.a('object');
-//                 res.body.should.have.property('error_code').eql("Bad Request");
-//             done();
-//           });
-//     });
+//     // it('Data Insufficient', (done) => {
+//     //     let record = {
+//     //         "data_schema": {
+//     //             "name": "JohndoeI",
+//     //             "mail": "jdoe1@gmail.com",
+//     //             "age": 20
+//     //         },
+//     //         "router_config": {
+//     //             "Ip_address": "192.158.1.03"
+//     //         },
+//     //         "status": "Active",
+//     //         "created_by": "System",
+//     //         "updated_by": "Madhusudhan"
+//     //     }
+//     //   chai.request(app)
+//     //     .post('/dataset1/create')
+//     //     .send(record)
+//     //     .end((err:any, res:any) => {               
+//     //             res.should.have.status(400);
+//     //             res.body.should.be.a('object');
+//     //             res.body.should.have.property('error_code').eql("Bad Request");
+//     //         done();
+//     //       });
+//     // });
 //     it('Record created ', (done) => {
 //         let record = {
 //             "id": "107",
